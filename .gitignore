@@ -10,7 +10,7 @@ env/
 # Environment variables
 .env
 
-# Uploaded and generated files
+# Uploaded and processed files
 uploads/
 
 # Editors and OS files

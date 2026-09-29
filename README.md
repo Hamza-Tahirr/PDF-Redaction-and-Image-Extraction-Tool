@@ -1,65 +1,66 @@
 # PDF Redaction and Image Extraction Tool
 
-This is a Flask-based web application that allows users to upload PDF files, automatically redact names and the word "Individual" from the documents, and extract circular images larger than 30px. The modified PDF and extracted images are displayed to the user for download or printing.
+A small Flask web app for cleaning up photo directory PDFs, where each page is a grid of profile photos with a `LastName, FirstName` label under every photo. The app rewrites the names, extracts the photos, and lets you remove selected people from the document in a second step.
+
+This is a portfolio version of a freelance project. The client's documents are not included, so you need your own PDF in this layout to try it.
 
 ## Features
 
-- **PDF Upload**: Users can upload a PDF document via the web interface.
-- **Text Redaction**: The application automatically redacts names (formatted as `LastName, FirstName`) and the word "Individual" from the PDF.
-- **Image Extraction**: Circular images larger than 30px are extracted from the PDF and saved to the server.
-- **PDF Preview**: The redacted PDF is displayed in-browser with options to download the modified file.
-- **Image Gallery**: Extracted images are shown in a gallery with information about their coordinates within the PDF.
-- **Print Images**: Users can view and print extracted images directly from the browser.
+- Upload a PDF through a simple web form.
+- Rewrites names written as `LastName, FirstName` to `FirstName LastName` and removes the word "Individual" from the pages.
+- Extracts the roughly square photos larger than 30 pt and saves each one as a 100x100 PNG in `uploads/`, named after the person on that page (or `Unnamed_N` if no name is found).
+- Adds a checkbox form field above every photo and shows the modified PDF in the browser, with a download button.
+- Upload the PDF again with some boxes ticked and the app removes each ticked photo together with the name printed under it, drops the checkboxes, and shows the final PDF for download.
 
-## Technologies Used
+## Tech Stack
 
-- **Python** (Flask framework)
-- **PyMuPDF** (for PDF manipulation and image extraction)
-- **Pillow** (for image processing)
-- **HTML/CSS** (with Bootstrap for responsive design)
-- **JavaScript** (for modal and image gallery functionality)
+- Python and Flask
+- PyMuPDF for reading, editing and redacting the PDF
+- Pillow for resizing and saving the extracted photos
+- Bootstrap 5 (loaded from a CDN) for the pages
 
-## Installation
+## Project Structure
 
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/Hamza-Tahirr/PDF-Redaction-and-Image-Extraction-Tool.git
-    cd pdf-redaction-image-extraction
-    ```
+```
+app.py              Flask routes and PDF processing
+requirements.txt    Python dependencies
+templates/
+  upload.html       upload form
+  display.html      modified PDF with checkboxes
+  remove.html       upload form for the ticked PDF
+  final.html        final PDF with download link
+uploads/            created at runtime for uploaded and processed files (not tracked)
+```
 
-2. Install the required dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+## Setup
 
-    > **Note:** The main dependencies are `Flask`, `PyMuPDF`, and `Pillow`. Make sure to install these in your environment.
+Requires Python 3.9 or newer.
 
-3. Run the Flask application:
-    ```bash
-    python app.py
-    ```
+```bash
+git clone https://github.com/Hamza-Tahirr/PDF-Redaction-and-Image-Extraction-Tool.git
+cd PDF-Redaction-and-Image-Extraction-Tool
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
 
-4. Access the application in your web browser at `http://127.0.0.1:5000/`.
+Then open http://127.0.0.1:5001/ in your browser. No API keys or environment variables are needed.
 
 ## Usage
 
-1. Open the application in your browser.
-2. Upload a PDF file using the **Upload PDF** page.
-3. The application will process the PDF, redact specified names and words, and extract circular images.
-4. The redacted PDF will be displayed on the **PDF Display** page, along with a gallery of extracted images.
-5. You can:
-   - **Download** the redacted PDF file.
-   - **View** and **print** extracted images.
+1. Upload a PDF on the start page. The modified PDF opens with a checkbox above each photo.
+2. Tick the boxes for the photos you want to remove. You can do this in the browser's PDF viewer or download the file and use any PDF reader that supports form fields. Save the PDF.
+3. Click **Remove Ticked Photos** and upload the saved PDF.
+4. The final PDF, without the removed photos and the checkboxes, is shown with a **Download Final PDF** button.
 
-## File Structure
+## Limitations
 
-```plaintext
-├── app.py                # Main Flask application
-├── requirements.txt       # Python dependencies
-├── templates/
-│   ├── upload.html        # HTML template for PDF upload page
-│   ├── display.html       # HTML template for PDF and image display page
-├── static/
-│   ├── css/               # Optional CSS files (for additional styling)
-│   └── js/                # Optional JavaScript files
-└── uploads/               # Directory to store uploaded and processed files
+- The processing is written for one layout: a grid of photos with the name directly below each photo. Other layouts will need changes to the size check and the name pattern in `app.py`.
+- Photos are paired with names in the order they appear on the page, so the file names of the saved photos depend on that order.
+- Uploaded and processed files stay in `uploads/` until you delete them.
+- The app runs on Flask's development server and is meant for local use.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
